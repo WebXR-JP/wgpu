@@ -499,12 +499,28 @@ impl Device {
         let downlevel = adapter.raw.capabilities.downlevel.clone();
         let limits = &adapter.raw.capabilities.limits;
 
-        let enable_indirect_validation = instance_flags
-            .contains(wgt::InstanceFlags::VALIDATION_INDIRECT_CALL)
-            && downlevel.flags.contains(
-                wgt::DownlevelFlags::INDIRECT_EXECUTION | wgt::DownlevelFlags::COMPUTE_SHADERS,
-            )
-            && limits.max_storage_buffers_per_shader_stage >= 2;
+        // [WebXR-JP fork] Force-disable indirect_validation.
+        //
+        // The CS pre-pass that `indirect_validation` inserts before every
+        // `vkCmdDrawIndexedIndirect` triggers a silent-fail in the Qualcomm
+        // Adreno Vulkan driver shipped with PICO 4 Ultra (and very likely Meta
+        // Quest 2/3 — see gfx-rs/wgpu#8801). The indirect draw itself is fine
+        // on that driver when its source buffer is not written by a CS earlier
+        // in the same submission, so turning off the validation pre-pass is a
+        // safe workaround for downstream apps that manage their own indirect
+        // args.
+        //
+        // Full root-cause analysis and minimum reproduction:
+        //   https://github.com/gfx-rs/wgpu/issues/8801
+        //   (avatar-renderer / wgpu-xr-indirect-repro)
+        //
+        // We also cannot disable this via `InstanceFlags` from the XR code
+        // path because `Instance::from_hal_instance` (see `src/instance.rs`)
+        // hardcodes `flags: InstanceFlags::default()` regardless of what was
+        // passed to `wgpu_hal::vulkan::Instance::from_raw` — that's a separate
+        // upstream bug.
+        let _ = (instance_flags, &downlevel, limits);
+        let enable_indirect_validation = false;
 
         let indirect_validation = if enable_indirect_validation {
             Some(crate::indirect_validation::IndirectValidation::new(
