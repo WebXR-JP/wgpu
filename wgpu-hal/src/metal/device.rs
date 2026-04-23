@@ -246,8 +246,10 @@ impl super::Device {
                 // Xcode Metal Shader Debugger のためにデバッグシンボルを有効化する
                 // MTLCompileOptions.debuggingEnabled は macOS 14+ / iOS 17+ で利用可能
                 // objc2-metal 0.3.2 のバインディングに未収録のため msg_send! で呼ぶ
-                #[cfg(debug_assertions)]
-                if available!(macos = 14.0, ios = 17.0, tvos = 17.0, visionos = 1.0) {
+                // WGPU_METAL_DEBUG_SHADERS=1 で有効化（release ビルドでも動作）
+                if std::env::var("WGPU_METAL_DEBUG_SHADERS").is_ok()
+                    && available!(macos = 14.0, ios = 17.0, tvos = 17.0, visionos = 1.0)
+                {
                     unsafe { msg_send![&*options, setDebuggingEnabled: true] }
                 }
 
