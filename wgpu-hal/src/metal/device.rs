@@ -4,7 +4,7 @@ use std::{thread, time};
 
 use bytemuck::TransparentWrapper;
 use objc2::{
-    available,
+    available, msg_send,
     rc::{autoreleasepool, Retained},
     runtime::ProtocolObject,
 };
@@ -224,12 +224,31 @@ impl super::Device {
                     &source
                 );
 
+                // WGPU_METAL_DUMP_SHADERS=./tmp/shaders で MSL ソースをディスクに書き出す
+                if let Ok(dump_dir) = std::env::var("WGPU_METAL_DUMP_SHADERS") {
+                    let dir = std::path::Path::new(&dump_dir);
+                    let _ = std::fs::create_dir_all(dir);
+                    let filename =
+                        format!("{}-{:?}.msl", stage.entry_point, naga_stage);
+                    if let Err(e) = std::fs::write(dir.join(&filename), &source) {
+                        log::warn!("WGPU_METAL_DUMP_SHADERS: failed to write {filename}: {e}");
+                    }
+                }
+
                 let options = MTLCompileOptions::new();
                 options.setLanguageVersion(self.shared.private_caps.msl_version);
 
                 // https://developer.apple.com/documentation/metal/mtlcompileoptions/preserveinvariance
                 if available!(macos = 11.0, ios = 13.0, tvos = 14.0, visionos = 1.0) {
                     options.setPreserveInvariance(true);
+                }
+
+                // Xcode Metal Shader Debugger のためにデバッグシンボルを有効化する
+                // MTLCompileOptions.debuggingEnabled は macOS 14+ / iOS 17+ で利用可能
+                // objc2-metal 0.3.2 のバインディングに未収録のため msg_send! で呼ぶ
+                #[cfg(debug_assertions)]
+                if available!(macos = 14.0, ios = 17.0, tvos = 17.0, visionos = 1.0) {
+                    unsafe { msg_send![&*options, setDebuggingEnabled: true] }
                 }
 
                 let library = self
