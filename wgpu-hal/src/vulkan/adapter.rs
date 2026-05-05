@@ -2174,11 +2174,12 @@ impl super::Instance {
                 {
                     log::debug!("Adapter is not Vulkan compliant: {}", info.name);
                 } else {
-                    log::debug!(
-                        "Adapter is not Vulkan compliant, hiding adapter: {}",
+                    // Allow non-compliant adapters for dzn (D3D12-Vulkan translation) and similar
+                    // in development environments like WSL2 where no compliant Vulkan driver exists.
+                    log::warn!(
+                        "Adapter is not Vulkan compliant, but allowing for development use: {}",
                         info.name
                     );
-                    return None;
                 }
             }
         }
