@@ -437,11 +437,12 @@ impl PhysicalDeviceFeatures {
                 _ => None,
             },
             _16bit_storage: if requested_features.contains(wgt::Features::SHADER_F16) {
+                let has_uniform_16 = phd_features._16bit_storage.as_ref().is_some_and(|f| f.uniform_and_storage_buffer16_bit_access != 0);
                 Some(
                     vk::PhysicalDevice16BitStorageFeatures::default()
                         .storage_buffer16_bit_access(true)
                         .storage_input_output16(phd_features.supports_storage_input_output_16())
-                        .uniform_and_storage_buffer16_bit_access(true),
+                        .uniform_and_storage_buffer16_bit_access(has_uniform_16),
                 )
             } else {
                 None
@@ -853,12 +854,12 @@ impl PhysicalDeviceFeatures {
         if let (Some(ref f16_i8), Some(ref bit16)) = (self.shader_float16_int8, self._16bit_storage)
         {
             // Note `storage_input_output16` is not required, we polyfill `f16` I/O using `f32`
-            // types when this capability is not available
+            // types when this capability is not available.
+            // `uniformAndStorageBuffer16BitAccess` is not required either: WebGPU `shader-f16`
+            // only gates f16 arithmetic and storage buffer access, not uniform buffer f16 layout.
             features.set(
                 F::SHADER_F16,
-                f16_i8.shader_float16 != 0
-                    && bit16.storage_buffer16_bit_access != 0
-                    && bit16.uniform_and_storage_buffer16_bit_access != 0,
+                f16_i8.shader_float16 != 0 && bit16.storage_buffer16_bit_access != 0,
             );
         }
 
