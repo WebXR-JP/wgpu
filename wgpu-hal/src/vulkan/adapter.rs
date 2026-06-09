@@ -437,7 +437,10 @@ impl PhysicalDeviceFeatures {
                 _ => None,
             },
             _16bit_storage: if requested_features.contains(wgt::Features::SHADER_F16) {
-                let has_uniform_16 = phd_features._16bit_storage.as_ref().is_some_and(|f| f.uniform_and_storage_buffer16_bit_access != 0);
+                let has_uniform_16 = phd_features
+                    ._16bit_storage
+                    .as_ref()
+                    .is_some_and(|f| f.uniform_and_storage_buffer16_bit_access != 0);
                 Some(
                     vk::PhysicalDevice16BitStorageFeatures::default()
                         .storage_buffer16_bit_access(true)
