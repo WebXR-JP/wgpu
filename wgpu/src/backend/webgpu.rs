@@ -826,7 +826,7 @@ fn map_wgt_limits(limits: webgpu_sys::GpuSupportedLimits) -> wgt::Limits {
         max_compute_workgroup_size_y: limits.max_compute_workgroup_size_y(),
         max_compute_workgroup_size_z: limits.max_compute_workgroup_size_z(),
         max_compute_workgroups_per_dimension: limits.max_compute_workgroups_per_dimension(),
-        max_immediate_size: wgt::Limits::default().max_immediate_size,
+        max_immediate_size: limits.max_immediate_size(),
         max_non_sampler_bindings: wgt::Limits::default().max_non_sampler_bindings,
 
         max_task_mesh_workgroup_total_count: wgt::Limits::default()
@@ -928,6 +928,7 @@ fn map_js_sys_limits(limits: &wgt::Limits) -> js_sys::Object {
         (maxComputeWorkgroupSizeY, max_compute_workgroup_size_y),
         (maxComputeWorkgroupSizeZ, max_compute_workgroup_size_z),
         (maxComputeWorkgroupsPerDimension, max_compute_workgroups_per_dimension),
+        (maxImmediateSize, max_immediate_size),
     ];
 
     object
@@ -1719,7 +1720,11 @@ impl dispatch::AdapterInterface for WebAdapter {
     }
 
     fn features(&self) -> crate::Features {
-        map_wgt_features(self.inner.features())
+        let mut features = map_wgt_features(self.inner.features());
+        if self.limits().max_immediate_size >= 16 {
+            features |= wgt::Features::IMMEDIATES;
+        }
+        features
     }
 
     fn limits(&self) -> crate::Limits {
@@ -1758,7 +1763,11 @@ impl Drop for WebAdapter {
 
 impl dispatch::DeviceInterface for WebDevice {
     fn features(&self) -> crate::Features {
-        map_wgt_features(self.inner.features())
+        let mut features = map_wgt_features(self.inner.features());
+        if self.limits().max_immediate_size >= 16 {
+            features |= wgt::Features::IMMEDIATES;
+        }
+        features
     }
 
     fn limits(&self) -> crate::Limits {
@@ -2149,6 +2158,9 @@ impl dispatch::DeviceInterface for WebDevice {
         let mapped_desc = webgpu_sys::GpuPipelineLayoutDescriptor::new(&temp_layouts);
         if let Some(label) = desc.label {
             mapped_desc.set_label(label);
+        }
+        if desc.immediate_size > 0 {
+            mapped_desc.immediate_size(desc.immediate_size);
         }
 
         let pipeline_layout = self.inner.create_pipeline_layout(&mapped_desc);
@@ -3344,8 +3356,8 @@ impl dispatch::ComputePassInterface for WebComputePassEncoder {
         }
     }
 
-    fn set_immediates(&mut self, _offset: u32, _data: &[u8]) {
-        panic!("IMMEDIATES feature must be enabled to call set_immediates")
+    fn set_immediates(&mut self, offset: u32, data: &[u8]) {
+        self.inner.set_immediates(offset, data);
     }
 
     fn insert_debug_marker(&mut self, label: &str) {
@@ -3473,8 +3485,8 @@ impl dispatch::RenderPassInterface for WebRenderPassEncoder {
         }
     }
 
-    fn set_immediates(&mut self, _offset: u32, _data: &[u8]) {
-        panic!("IMMEDIATES feature must be enabled to call set_immediates")
+    fn set_immediates(&mut self, offset: u32, data: &[u8]) {
+        self.inner.set_immediates(offset, data);
     }
 
     fn set_blend_constant(&mut self, color: crate::Color) {
@@ -3764,8 +3776,8 @@ impl dispatch::RenderBundleEncoderInterface for WebRenderBundleEncoder {
         }
     }
 
-    fn set_immediates(&mut self, _offset: u32, _data: &[u8]) {
-        panic!("IMMEDIATES feature must be enabled to call set_immediates")
+    fn set_immediates(&mut self, offset: u32, data: &[u8]) {
+        self.inner.set_immediates(offset, data);
     }
 
     fn draw(&mut self, vertices: Range<u32>, instances: Range<u32>) {
