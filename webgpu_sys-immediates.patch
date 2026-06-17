@@ -1,0 +1,97 @@
+diff --git a/wgpu/src/backend/webgpu/webgpu_sys/gen_GpuComputePassEncoder.rs b/wgpu/src/backend/webgpu/webgpu_sys/gen_GpuComputePassEncoder.rs
+index 1e57894e2..8a51727a5 100644
+--- a/wgpu/src/backend/webgpu/webgpu_sys/gen_GpuComputePassEncoder.rs
++++ b/wgpu/src/backend/webgpu/webgpu_sys/gen_GpuComputePassEncoder.rs
+@@ -289,4 +289,14 @@ extern "C" {
+     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+     #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+     pub fn push_debug_group(this: &GpuComputePassEncoder, group_label: &str);
++
++    // MANUAL PATCH: IMMEDIATES support
++    #[wasm_bindgen(method, js_name = setImmediates)]
++    #[doc = "The `setImmediates()` method."]
++    #[doc = ""]
++    #[doc = "*This API requires the following crate features to be activated: `GpuComputePassEncoder`*"]
++    #[doc = ""]
++    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
++    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
++    pub fn set_immediates(this: &GpuComputePassEncoder, offset: u32, data: &[u8]);
+ }
+diff --git a/wgpu/src/backend/webgpu/webgpu_sys/gen_GpuPipelineLayoutDescriptor.rs b/wgpu/src/backend/webgpu/webgpu_sys/gen_GpuPipelineLayoutDescriptor.rs
+index 7fc190563..218de4af8 100644
+--- a/wgpu/src/backend/webgpu/webgpu_sys/gen_GpuPipelineLayoutDescriptor.rs
++++ b/wgpu/src/backend/webgpu/webgpu_sys/gen_GpuPipelineLayoutDescriptor.rs
+@@ -74,6 +74,16 @@ extern "C" {
+         this: &GpuPipelineLayoutDescriptor,
+         val: &::wasm_bindgen::JsValue,
+     );
++
++    // MANUAL PATCH: IMMEDIATES support
++    #[doc = "Change the `immediateSize` field of this object."]
++    #[doc = ""]
++    #[doc = "*This API requires the following crate features to be activated: `GpuPipelineLayoutDescriptor`*"]
++    #[doc = ""]
++    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
++    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
++    #[wasm_bindgen(method, setter = "immediateSize")]
++    pub fn immediate_size(this: &GpuPipelineLayoutDescriptor, val: u32);
+ }
+ 
+ impl GpuPipelineLayoutDescriptor {
+diff --git a/wgpu/src/backend/webgpu/webgpu_sys/gen_GpuRenderBundleEncoder.rs b/wgpu/src/backend/webgpu/webgpu_sys/gen_GpuRenderBundleEncoder.rs
+index 36519cd32..5f98a7310 100644
+--- a/wgpu/src/backend/webgpu/webgpu_sys/gen_GpuRenderBundleEncoder.rs
++++ b/wgpu/src/backend/webgpu/webgpu_sys/gen_GpuRenderBundleEncoder.rs
+@@ -653,4 +653,14 @@ extern "C" {
+         offset: f64,
+         size: f64,
+     );
++
++    // MANUAL PATCH: IMMEDIATES support
++    #[wasm_bindgen(method, js_name = setImmediates)]
++    #[doc = "The `setImmediates()` method."]
++    #[doc = ""]
++    #[doc = "*This API requires the following crate features to be activated: `GpuRenderBundleEncoder`*"]
++    #[doc = ""]
++    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
++    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
++    pub fn set_immediates(this: &GpuRenderBundleEncoder, offset: u32, data: &[u8]);
+ }
+diff --git a/wgpu/src/backend/webgpu/webgpu_sys/gen_GpuRenderPassEncoder.rs b/wgpu/src/backend/webgpu/webgpu_sys/gen_GpuRenderPassEncoder.rs
+index 7de607c63..8bb6d7ef0 100644
+--- a/wgpu/src/backend/webgpu/webgpu_sys/gen_GpuRenderPassEncoder.rs
++++ b/wgpu/src/backend/webgpu/webgpu_sys/gen_GpuRenderPassEncoder.rs
+@@ -741,4 +741,14 @@ extern "C" {
+         offset: f64,
+         size: f64,
+     );
++
++    // MANUAL PATCH: IMMEDIATES support
++    #[wasm_bindgen(method, js_name = setImmediates)]
++    #[doc = "The `setImmediates()` method."]
++    #[doc = ""]
++    #[doc = "*This API requires the following crate features to be activated: `GpuRenderPassEncoder`*"]
++    #[doc = ""]
++    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
++    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
++    pub fn set_immediates(this: &GpuRenderPassEncoder, offset: u32, data: &[u8]);
+ }
+diff --git a/wgpu/src/backend/webgpu/webgpu_sys/gen_GpuSupportedLimits.rs b/wgpu/src/backend/webgpu/webgpu_sys/gen_GpuSupportedLimits.rs
+index 8323fe6e2..2d34c4541 100644
+--- a/wgpu/src/backend/webgpu/webgpu_sys/gen_GpuSupportedLimits.rs
++++ b/wgpu/src/backend/webgpu/webgpu_sys/gen_GpuSupportedLimits.rs
+@@ -378,4 +378,14 @@ extern "C" {
+     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+     #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+     pub fn max_compute_workgroups_per_dimension(this: &GpuSupportedLimits) -> u32;
++
++    // MANUAL PATCH: IMMEDIATES support
++    # [wasm_bindgen (structural , method , getter , js_class = "GPUSupportedLimits" , js_name = maxImmediateSize)]
++    #[doc = "Getter for the `maxImmediateSize` field of this object."]
++    #[doc = ""]
++    #[doc = "*This API requires the following crate features to be activated: `GpuSupportedLimits`*"]
++    #[doc = ""]
++    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
++    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
++    pub fn max_immediate_size(this: &GpuSupportedLimits) -> u32;
+ }

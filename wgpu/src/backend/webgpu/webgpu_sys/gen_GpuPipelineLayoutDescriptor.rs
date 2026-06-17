@@ -74,6 +74,16 @@ extern "C" {
         this: &GpuPipelineLayoutDescriptor,
         val: &::wasm_bindgen::JsValue,
     );
+
+    // MANUAL PATCH: IMMEDIATES support
+    #[doc = "Change the `immediateSize` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `GpuPipelineLayoutDescriptor`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[wasm_bindgen(method, setter = "immediateSize")]
+    pub fn immediate_size(this: &GpuPipelineLayoutDescriptor, val: u32);
 }
 
 impl GpuPipelineLayoutDescriptor {

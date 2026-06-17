@@ -378,4 +378,14 @@ extern "C" {
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
     #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     pub fn max_compute_workgroups_per_dimension(this: &GpuSupportedLimits) -> u32;
+
+    // MANUAL PATCH: IMMEDIATES support
+    # [wasm_bindgen (structural , method , getter , js_class = "GPUSupportedLimits" , js_name = maxImmediateSize)]
+    #[doc = "Getter for the `maxImmediateSize` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `GpuSupportedLimits`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    pub fn max_immediate_size(this: &GpuSupportedLimits) -> u32;
 }
